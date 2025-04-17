@@ -11,19 +11,39 @@ import numpy as np
 from functools import lru_cache
 import concurrent.futures
 from difflib import SequenceMatcher
+import os
 
 def safe_load_data(file_path):
     try:
-        return joblib.load(file_path)
+        # Check if file exists
+        if not os.path.exists(file_path):
+            st.error(f"File not found: {file_path}")
+            st.error(f"Current working directory: {os.getcwd()}")
+            st.error(f"Directory contents: {os.listdir('.')}")
+            return None
+            
+        # Try to load the file
+        data = joblib.load(file_path)
+        st.success(f"Successfully loaded {file_path}")
+        return data
     except Exception as e:
         st.error(f"Error loading {file_path}: {str(e)}")
         return None
 
 # Load data files with error handling
 try:
-    movies = safe_load_data('movies.pkl')
-    movie_list = safe_load_data('movie_list.pkl')
-    similarity = safe_load_data('similarity.pkl')
+    # Get the absolute path of the current directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Construct absolute paths for the data files
+    movies_path = os.path.join(current_dir, 'movies.pkl')
+    movie_list_path = os.path.join(current_dir, 'movie_list.pkl')
+    similarity_path = os.path.join(current_dir, 'similarity.pkl')
+    
+    # Load the files
+    movies = safe_load_data(movies_path)
+    movie_list = safe_load_data(movie_list_path)
+    similarity = safe_load_data(similarity_path)
 
     if movies is None or movie_list is None or similarity is None:
         st.error("Failed to load required data files. Please check the data files.")
