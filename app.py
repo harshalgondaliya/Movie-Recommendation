@@ -15,18 +15,28 @@ from difflib import SequenceMatcher
 def safe_load_pickle(file_path):
     try:
         with open(file_path, 'rb') as f:
-            return pickle.load(f)
+            # Try different pickle protocols
+            try:
+                return pickle.load(f)
+            except:
+                # If that fails, try with protocol 4
+                f.seek(0)
+                return pickle.load(f, encoding='latin1')
     except Exception as e:
         st.error(f"Error loading {file_path}: {str(e)}")
         return None
 
-# Load data files
-movies = safe_load_pickle('movies.pkl')
-movie_list = safe_load_pickle('movie_list.pkl')
-similarity = safe_load_pickle('similarity.pkl')
+# Load data files with error handling
+try:
+    movies = safe_load_pickle('movies.pkl')
+    movie_list = safe_load_pickle('movie_list.pkl')
+    similarity = safe_load_pickle('similarity.pkl')
 
-if movies is None or movie_list is None or similarity is None:
-    st.error("Failed to load required data files. Please check the pickle files.")
+    if movies is None or movie_list is None or similarity is None:
+        st.error("Failed to load required data files. Please check the pickle files.")
+        st.stop()
+except Exception as e:
+    st.error(f"Error loading data files: {str(e)}")
     st.stop()
 
 # Initialize session state for loading
