@@ -13,37 +13,45 @@ import concurrent.futures
 from difflib import SequenceMatcher
 import os
 
-def safe_load_data(file_path):
+def find_data_file(filename):
+    # Possible locations where the file might be
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), filename),  # Same directory as app.py
+        os.path.join(os.getcwd(), filename),  # Current working directory
+        os.path.join('/mount/src/movie-recommendation', filename),  # Deployment path
+        filename  # Just the filename (relative path)
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            st.info(f"Found {filename} at: {path}")
+            return path
+    
+    st.error(f"Could not find {filename} in any of these locations:")
+    for path in possible_paths:
+        st.error(f"- {path}")
+    return None
+
+def safe_load_data(filename):
     try:
-        # Check if file exists
-        if not os.path.exists(file_path):
-            st.error(f"File not found: {file_path}")
-            st.error(f"Current working directory: {os.getcwd()}")
-            st.error(f"Directory contents: {os.listdir('.')}")
+        file_path = find_data_file(filename)
+        if file_path is None:
             return None
             
         # Try to load the file
         data = joblib.load(file_path)
-        st.success(f"Successfully loaded {file_path}")
+        st.success(f"Successfully loaded {filename}")
         return data
     except Exception as e:
-        st.error(f"Error loading {file_path}: {str(e)}")
+        st.error(f"Error loading {filename}: {str(e)}")
         return None
 
 # Load data files with error handling
 try:
-    # Get the absolute path of the current directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Construct absolute paths for the data files
-    movies_path = os.path.join(current_dir, 'movies.pkl')
-    movie_list_path = os.path.join(current_dir, 'movie_list.pkl')
-    similarity_path = os.path.join(current_dir, 'similarity.pkl')
-    
     # Load the files
-    movies = safe_load_data(movies_path)
-    movie_list = safe_load_data(movie_list_path)
-    similarity = safe_load_data(similarity_path)
+    movies = safe_load_data('movies.pkl')
+    movie_list = safe_load_data('movie_list.pkl')
+    similarity = safe_load_data('similarity.pkl')
 
     if movies is None or movie_list is None or similarity is None:
         st.error("Failed to load required data files. Please check the data files.")
