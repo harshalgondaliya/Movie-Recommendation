@@ -12,6 +12,23 @@ from functools import lru_cache
 import concurrent.futures
 from difflib import SequenceMatcher
 
+def safe_load_pickle(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            return pickle.load(f)
+    except Exception as e:
+        st.error(f"Error loading {file_path}: {str(e)}")
+        return None
+
+# Load data files
+movies = safe_load_pickle('movies.pkl')
+movie_list = safe_load_pickle('movie_list.pkl')
+similarity = safe_load_pickle('similarity.pkl')
+
+if movies is None or movie_list is None or similarity is None:
+    st.error("Failed to load required data files. Please check the pickle files.")
+    st.stop()
+
 # Initialize session state for loading
 if 'is_loading' not in st.session_state:
     st.session_state.is_loading = False
@@ -752,8 +769,6 @@ st.markdown('<h1 class="header">🎬 Movie Suggestion System</h1>', unsafe_allow
 # Container for better layout
 with st.container():
     try:
-        movies = pickle.load(open('movie_list.pkl','rb'))
-        similarity = pickle.load(open('similarity.pkl','rb'))
         # Initialize the movie index
         initialize_movie_index()
     except Exception as e:
