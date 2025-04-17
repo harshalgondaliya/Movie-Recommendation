@@ -4,6 +4,13 @@
 
 A modern, interactive movie recommendation system built with Streamlit and powered by TMDB dataset. This application helps users discover new movies based on their preferences and selected genres.
 
+## ⚠️ Important: Large Model File
+Due to size constraints, the similarity matrix file (`similarity.pkl`, ~176MB) is not included in this repository. Please follow these steps to set up the model:
+
+1. Download `similarity.pkl` from [Google Drive](https://drive.google.com/file/YOUR_FILE_ID/view) (You'll need to upload the file to Google Drive and replace this link)
+2. Place the downloaded file in the root directory of the project
+3. Make sure the file is named exactly as `similarity.pkl`
+
 ![Movie Recommender System](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python)
 ![TMDB](https://img.shields.io/badge/TMDB-01D277?style=for-the-badge&logo=themoviedatabase&logoColor=white)
